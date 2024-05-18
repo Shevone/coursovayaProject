@@ -1,0 +1,5 @@
+storage_path: "./storage/database.db" # путь до файла бд
+token_ttl: 1h # время актуальности токена
+grpc: # настройка grpc сервера
+  port: 44044
+  timeout: 7s

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../fitnes-client/.idea/fitnes-client.iml" filepath="$PROJECT_DIR$/../fitnes-client/.idea/fitnes-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../fitnes-gateway/.idea/fitnes-gateway.iml" filepath="$PROJECT_DIR$/../fitnes-gateway/.idea/fitnes-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/fitnes-lessons.iml" filepath="$PROJECT_DIR$/.idea/fitnes-lessons.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../proto-fitnes/.idea/proto-fitnes.iml" filepath="$PROJECT_DIR$/../proto-fitnes/.idea/proto-fitnes.iml" />
+    </modules>
+  </component>
+</project>

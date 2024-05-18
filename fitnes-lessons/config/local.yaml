@@ -1,0 +1,4 @@
+storage_path: "./storage/lessons2.db" # путь до файла бд
+grpc: # настройка grpc сервера
+  port: 4312
+  timeout: 7s
