@@ -31,13 +31,14 @@ type Accounts interface {
 	EditUserProfile(
 		ctx context.Context,
 		userId int64,
-		name string, surname string, patronymic string) error
+		name string, surname string, patronymic string, updaterId int64) error
 	GetUserData(ctx context.Context, userId int64) (
-		user models.User, err error)
+		user *models.User, err error)
 	GetUsers(ctx context.Context, page int64, limit int64) (
-		[]models.User, error)
-	UpdateUserRole(ctx context.Context, userId int64, newRole string) (
+		[]*models.User, error)
+	UpdateUserRole(ctx context.Context, userId int64, newRole string, updaterId int64) (
 		string, error)
+	UpdatePassword(ctx context.Context, userId int64, password string, updaterId int64) (string, error)
 }
 
 // Register - метод регистрирующий наш обработчик(Accounts) на созданный grpc сервер
@@ -105,7 +106,7 @@ func (s *serverApi) EditProfile(ctx context.Context, in *accountsFitnesv1.EditRe
 
 		return nil, status.Error(codes.InvalidArgument, "all personal data is required")
 	}
-	err := s.accountsService.EditUserProfile(ctx, in.GetUserId(), in.GetName(), in.GetSurname(), in.GetPatronymic())
+	err := s.accountsService.EditUserProfile(ctx, in.GetUserId(), in.GetName(), in.GetSurname(), in.GetPatronymic(), in.GetUpdaterId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to edit user profile")
 	}
@@ -189,10 +190,22 @@ func (s *serverApi) UpdateUserRole(ctx context.Context, in *accountsFitnesv1.Upd
 		return nil, status.Error(codes.InvalidArgument, "user id must be greater than 0")
 	}
 
-	message, err := s.accountsService.UpdateUserRole(ctx, in.UserId, in.Role.String())
+	message, err := s.accountsService.UpdateUserRole(ctx, in.UserId, in.Role.String(), in.UpdaterId)
 
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to change user role")
 	}
 	return &accountsFitnesv1.UpdateUserRoleResp{Message: message}, nil
+}
+func (s *serverApi) UpdateUserPassword(ctx context.Context, in *accountsFitnesv1.UpdateUserPasswordReq) (*accountsFitnesv1.UpdateUserPasswordResp, error) {
+	if in.UserId < 0 {
+		return nil, status.Error(codes.InvalidArgument, "user id must be greater than 0")
+	}
+
+	message, err := s.accountsService.UpdatePassword(ctx, in.UserId, in.Password, in.UpdaterId)
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to change user role")
+	}
+	return &accountsFitnesv1.UpdateUserPasswordResp{Message: message}, nil
 }

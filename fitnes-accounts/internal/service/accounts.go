@@ -17,6 +17,9 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
+type Config struct {
+	TokenTTL time.Duration
+}
 type AccountService struct {
 	logger      *slog.Logger
 	usrSaver    UserSaver
@@ -27,43 +30,51 @@ type AccountService struct {
 type UserSaver interface {
 	SaveUser(
 		ctx context.Context,
-		newUser models.User,
+		newUser *models.User,
 	) (uid int64, err error)
 	EditUser(
 		ctx context.Context,
-		editedProfile models.User,
+		editedProfile *models.User,
+		updaterId int64,
 	) error
 	EditUserRole(
 		ctx context.Context,
 		userId int64,
 		newRole string,
+		updaterId int64,
+	) (string, error)
+	UpdateUserPassword(
+		ctx context.Context,
+		userId int64,
+		newPassword []byte,
+		updaterId int64,
 	) (string, error)
 }
 type UserProvider interface {
 	User(
 		ctx context.Context,
 		email string,
-	) (models.User, error)
+	) (*models.User, error)
 	GetUserDataById(
 		ctx context.Context,
 		userid int64,
-	) (models.User, error)
+	) (*models.User, error)
 	GetUsers(
 		ctx context.Context,
 		page int64,
 		limit int64,
-	) ([]models.User, error)
+	) ([]*models.User, error)
 }
 
 // NewAccountService - конструктор сервисного слоя
 func NewAccountService(
-	logger *slog.Logger, usrSaver UserSaver, usrProvider UserProvider, tokenTTl time.Duration,
+	logger *slog.Logger, usrSaver UserSaver, usrProvider UserProvider, cfg *Config,
 ) *AccountService {
 	return &AccountService{
 		logger:      logger,
 		usrSaver:    usrSaver,
 		usrProvider: usrProvider,
-		tokenTTL:    tokenTTl,
+		tokenTTL:    cfg.TokenTTL,
 	}
 }
 
@@ -102,7 +113,7 @@ func (a *AccountService) Login(ctx context.Context, email string, password strin
 
 	log.Info("user logged in successfully")
 
-	token, err = lib.NewToken(user, os.Getenv("APP_SECRET"), a.tokenTTL)
+	token, err = lib.NewToken(*user, os.Getenv("APP_SECRET"), a.tokenTTL)
 	if err != nil {
 		a.logger.Error("failed to generate token", err)
 
@@ -133,7 +144,7 @@ func (a *AccountService) RegisterNewUser(
 	}
 
 	id, err := a.usrSaver.SaveUser(
-		ctx, models.User{
+		ctx, &models.User{
 			Email: email, PassHash: passHash, Name: name,
 			Surname: surname, Patronymic: patronymic, Role: role, PhoneNumber: phoneNumber})
 	if err != nil {
@@ -144,9 +155,31 @@ func (a *AccountService) RegisterNewUser(
 
 	return id, nil
 }
+func (a *AccountService) UpdatePassword(ctx context.Context, userId int64, password string, updaterId int64) (string, error) {
+	const op = "Accounts.UpdatePassword"
+
+	log := a.logger.With(
+		slog.String("op", op),
+		slog.Int64("userId", userId),
+	)
+
+	log.Info("update password of user")
+	passHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error("failed to generate password hash", err)
+
+		return "Ошибка сервера", fmt.Errorf("%s: %w", op, err)
+	}
+	msg, err := a.usrSaver.UpdateUserPassword(ctx, userId, passHash, updaterId)
+	if err != nil {
+		log.Error("failed to update password of user", err)
+		return "Ошибка сервера", fmt.Errorf("%s: %w", op, err)
+	}
+	return msg, nil
+}
 
 func (a *AccountService) EditUserProfile(
-	ctx context.Context, userId int64, name string, surname string, patronymic string,
+	ctx context.Context, userId int64, name string, surname string, patronymic string, updaterId int64,
 ) error {
 	const op = "Accounts.EditUserProfile"
 
@@ -157,7 +190,7 @@ func (a *AccountService) EditUserProfile(
 
 	log.Info("edit suer profile")
 
-	err := a.usrSaver.EditUser(ctx, models.User{ID: userId, Name: name, Surname: surname, Patronymic: patronymic})
+	err := a.usrSaver.EditUser(ctx, &models.User{ID: userId, Name: name, Surname: surname, Patronymic: patronymic}, updaterId)
 	if err != nil {
 		log.Error("failed to edit user Profile")
 		return err
@@ -165,7 +198,7 @@ func (a *AccountService) EditUserProfile(
 	return nil
 }
 
-func (a *AccountService) GetUserData(ctx context.Context, userId int64) (user models.User, err error) {
+func (a *AccountService) GetUserData(ctx context.Context, userId int64) (user *models.User, err error) {
 	const op = "Accounts.GetUserData"
 
 	log := a.logger.With(
@@ -178,12 +211,12 @@ func (a *AccountService) GetUserData(ctx context.Context, userId int64) (user mo
 	user, err = a.usrProvider.GetUserDataById(ctx, userId)
 	if err != nil {
 		log.Error("Failed to get user data")
-		return models.User{}, err
+		return nil, err
 	}
 	return user, nil
 }
 
-func (a *AccountService) GetUsers(ctx context.Context, page int64, limit int64) ([]models.User, error) {
+func (a *AccountService) GetUsers(ctx context.Context, page int64, limit int64) ([]*models.User, error) {
 	const op = "Accounts.GetUsers"
 
 	log := a.logger.With(
@@ -197,12 +230,12 @@ func (a *AccountService) GetUsers(ctx context.Context, page int64, limit int64) 
 
 	if err != nil {
 		log.Error("Failed to get users")
-		return []models.User{}, err
+		return nil, err
 	}
 	return users, nil
 }
 
-func (a *AccountService) UpdateUserRole(ctx context.Context, userId int64, newRole string) (string, error) {
+func (a *AccountService) UpdateUserRole(ctx context.Context, userId int64, newRole string, updaterId int64) (string, error) {
 	const op = "Accounts.UpdateUserRole"
 
 	log := a.logger.With(
@@ -213,7 +246,7 @@ func (a *AccountService) UpdateUserRole(ctx context.Context, userId int64, newRo
 
 	log.Info("attempting to change role to user")
 
-	message, err := a.usrSaver.EditUserRole(ctx, userId, newRole)
+	message, err := a.usrSaver.EditUserRole(ctx, userId, newRole, updaterId)
 	if err != nil {
 		log.Error("failed to change role")
 		return "err", err

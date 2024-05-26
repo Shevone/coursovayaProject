@@ -5,28 +5,29 @@ import (
 	models "fitnes-lessons/internal/models"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"log/slog"
 	"time"
 )
 
 // Saver
 // ==============================================
 
-func (s Storage) EditLessonDb(ctx context.Context, lesson *models.Lesson) (int64, error) {
-	const op = "SQLite.Edit"
-	stmt, err := s.db.Prepare("UPDATE lessons SET title = $1,available_seats = $2, description = $3, difficult = $4, date_and_time = $5 WHERE id = $6")
+func (s *Storage) EditLessonDb(ctx context.Context, lesson *models.Lesson) (int64, error) {
+	const op = "pq.Edit"
+	stmt, err := s.db.Prepare("UPDATE lessons SET name = $1,available_seats = $2, description = $3, difficulty = $4, starttime = $5, day_of_week = $6 WHERE id = $7")
 	if err != nil {
 		return -1, fmt.Errorf("%s, %w", op, err)
 	}
-	timeAndDate := remakeStrToTimeType(lesson.Time, lesson.Date)
-	_, err = stmt.ExecContext(ctx, lesson.Title, lesson.AvailableSeats, lesson.Description, lesson.Difficult, timeAndDate, lesson.LessonId)
+	timeFormatTime := remakeStrToTimeType(lesson.Time)
+	_, err = stmt.ExecContext(ctx, lesson.Title, lesson.AvailableSeats, lesson.Description, lesson.Difficult, timeFormatTime, lesson.DayOfWeek, lesson.LessonId)
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 	return lesson.LessonId, nil
 }
 
-func (s Storage) DeleteLessonDb(ctx context.Context, lessonId int64) (bool, error) {
-	const op = "SQLite.DeleteLesson"
+func (s *Storage) DeleteLessonDb(ctx context.Context, lessonId int64) (bool, error) {
+	const op = "pq.DeleteLesson"
 	stmt, err := s.db.Prepare(
 		"DELETE FROM lessons WHERE id = $1")
 	if err != nil {
@@ -38,7 +39,7 @@ func (s Storage) DeleteLessonDb(ctx context.Context, lessonId int64) (bool, erro
 		return false, fmt.Errorf("%s: %w", op, err)
 	}
 	stmt, err = s.db.Prepare(
-		"DELETE FROM student_lessons where lesson_id = ?")
+		"DELETE FROM student_lessons where lesson_id = $1")
 	if err != nil {
 		return false, fmt.Errorf("%s: %w", op, err)
 	}
@@ -49,30 +50,40 @@ func (s Storage) DeleteLessonDb(ctx context.Context, lessonId int64) (bool, erro
 	return true, nil
 }
 
-func (s Storage) CreateLessonDb(ctx context.Context, lesson *models.Lesson) (int64, error) {
-	const op = "SQLite.CreateLesson"
+func (s *Storage) CreateLessonDb(ctx context.Context, lesson *models.Lesson) (int64, error) {
+	const op = "pq.CreateLesson"
 	stmt, err := s.db.Prepare(
-		"INSERT INTO main.lessons (title, date_and_time ,trainer_id, available_seats,description,difficult) values ($1,$2,$3,$4,$5,$6)")
+		"INSERT INTO lessons (id, name, trainer_id, available_seats,description,difficulty, startTime, day_of_week) values ($1,$2,$3,$4,$5,$6,$7,$8)")
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 	defer stmt.Close()
-	timeAndDate := remakeStrToTimeType(lesson.Time, lesson.Date)
-	res, err := stmt.ExecContext(ctx, lesson.Title, timeAndDate, lesson.TrainerId, lesson.AvailableSeats, lesson.Description, lesson.Difficult)
+	timeFormatTime := remakeStrToTimeType(lesson.Time)
+	_, err = stmt.ExecContext(ctx, lesson.LessonId, lesson.Title, lesson.TrainerId, lesson.AvailableSeats, lesson.Description, lesson.Difficult, timeFormatTime, lesson.DayOfWeek)
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		return -1, fmt.Errorf("%s: %w", op, err)
-	}
-
-	return id, nil
+	return lesson.LessonId, nil
 }
 
-func remakeStrToTimeType(timeStr string, dateStr string) time.Time {
-	timeLayout := "15:04 02.01" // Формат времени: часы:минуты:секунды день.месяц
-	timeAndDateStr := timeStr + " " + dateStr
-	timeAndDate, _ := time.Parse(timeLayout, timeAndDateStr)
-	return timeAndDate
+func remakeStrToTimeType(timeStr string) time.Time {
+	timeT, err := time.Parse(timeStr, timeStr)
+	if err != nil {
+		slog.Error(err.Error())
+	}
+	return timeT
+}
+func (s *Storage) ClearLessonSub(ctx context.Context, lessonId int64) (bool, error) {
+	const op = "pq.ClearLessonSub"
+	query := "DELETE FROM student_lessons WHERE lesson_id = $1"
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+	defer stmt.Close()
+	_, err = stmt.ExecContext(ctx, lessonId)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+	return true, nil
 }

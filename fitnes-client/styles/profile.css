@@ -1,0 +1,15 @@
+button{
+    margin: 10px 10px;
+}
+/* Овальные рамки */
+.activities-list-item {
+    border: 2px solid #ccc;
+    border-radius: 20px; /* Создание овальной формы */
+    margin-bottom: 20px; /* Отступ между элементами списка */
+    padding: 10px; /* Отступ внутри элемента списка */
+}
+
+/* Строка параметров занятия */
+.activities-list-item {
+    margin-top: 10px; /* Отступ между параметрами занятия */
+}

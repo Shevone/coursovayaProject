@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fitnes-lessons/internal/app/grpcapp"
 	"fitnes-lessons/internal/repository/postgres"
 	"fitnes-lessons/internal/service"
@@ -16,15 +17,18 @@ type Config struct {
 	GRPC grpcapp.Config
 }
 
-func New(log *slog.Logger, cfg *Config) *App {
+func New(ctx context.Context, log *slog.Logger, cfg *Config) *App {
 	storage, err := postgres.NewPostgresRepository(&cfg.Repo)
 	if err != nil {
 		panic(err)
 	}
 
-	lessonService := service.NewLessonService(log, storage, storage, storage)
+	ls, err := service.NewLessonService(ctx, storage, storage, storage)
+	if err != nil {
+		panic(err)
+	}
 
-	grpcApp := grpcapp.NewGrpcApp(log, lessonService, &cfg.GRPC)
+	grpcApp := grpcapp.NewGrpcApp(log, ls, &cfg.GRPC)
 
 	return &App{
 		GRPCServer: grpcApp,

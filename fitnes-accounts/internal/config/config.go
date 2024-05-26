@@ -1,50 +1,63 @@
 package config
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
+	"bufio"
+	"fmt"
+	"github.com/kelseyhightower/envconfig"
 	"os"
-	"time"
+	"strings"
 )
 
-type Config struct {
-	StoragePath string        `yaml:"storage_path" env-required:"true"` // 2 - если будет пуст, то приложение не запустится
-	GRPC        GRPCConfig    `yaml:"grpc" env-required:"true"`
-	TokenTTL    time.Duration `yaml:"tokenTTL" env-default:"1h"`
-}
-type GRPCConfig struct {
-	Port    int           `yaml:"port" env-required:"true"`
-	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
+var (
+	envPrefix = "accounts"
+	envPath   = ".env"
+)
+
+// MustConfig returns AppConfig if all is well
+func MustConfig(configStruct interface{}) interface{} {
+	loadEnv(envPath)
+	err := envconfig.Process(envPrefix, configStruct)
+	if err != nil {
+		panic(err)
+	}
+	return configStruct
 }
 
-// MustLoad Must - функция не будет возвращать ошибку, а будет паниковать
-func MustLoad() *Config {
-	configPath := fetchConfigPath()
-	if configPath == "" {
-		panic("config path is empty")
+// to make sure there's a colon at the port.
+func processPort(port string) string {
+	if port[0] == ':' {
+		return port
+	}
+	return ":" + port
+}
+func loadEnv(dotEnvPath string) error {
+	// Open the .env file
+	file, err := os.Open(dotEnvPath)
+	if err != nil {
+		return fmt.Errorf("error opening .env file: %v", err)
+	}
+	defer file.Close()
+
+	// Create a scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		// Split the line by '=' character
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			// Skip lines without a variable value
+			continue
+		}
+		// Clean up the value from quotes, if any
+		value := strings.Trim(parts[1], "\"")
+		// Set the environment variable
+		os.Setenv(parts[0], value)
 	}
 
-	return MustLoadPath(configPath)
-}
-func MustLoadPath(configPath string) *Config {
-	// check if file exists
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-
-		panic("config file does not exist: " + configPath)
+	// Check for any errors while scanning the file
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error scanning .env file: %v", err)
 	}
 
-	var cfg Config
-
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		panic("cannot read config: " + err.Error())
-	}
-
-	return &cfg
-}
-
-// Метод, который будет искать путь до файла конфигурации
-// 1. из флагов при запуске программы через консоль
-// 2. из переменных окружения
-// upd берет чисто переменные окружения
-func fetchConfigPath() string {
-	return os.Getenv("CONFIG_PATH")
+	return nil
 }

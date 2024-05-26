@@ -3,35 +3,22 @@ package main
 import (
 	"fitnes-account/internal/app"
 	"fitnes-account/internal/config"
-	"github.com/joho/godotenv"
-	"log"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-func envLoad() {
-	// Инициализируем перменные окржения, с помощью .env файла
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
-	}
-	configPath := os.Getenv("CONFIG_PATH")
-	if configPath == "" {
-		panic("config path is empty")
-	}
-	appSalt := os.Getenv("APP_SECRET")
-	if appSalt == "" {
-		panic("salt for jwt is empty")
-	}
-}
 func main() {
-	envLoad()
+	//envLoad()
 
-	cfg := config.MustLoad()
+	appConfig := app.Config{}
+	config.MustConfig(&appConfig)
+
 	log := setupLogger()
+	slog.SetDefault(log)
 
-	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
+	application := app.New(log, &appConfig)
 	go func() {
 		application.GRPCServer.MustRun()
 	}()

@@ -5,7 +5,6 @@ import (
 	lessons "fitnes-lessons/internal/grpc"
 	"time"
 
-	"fitnes-lessons/internal/service"
 	"fmt"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
@@ -29,7 +28,7 @@ type Config struct {
 }
 
 // NewGrpcApp - конструктор
-func NewGrpcApp(log *slog.Logger, lessonService *service.LessonService, cfg *Config) *App {
+func NewGrpcApp(log *slog.Logger, lessonService lessons.Service, cfg *Config) *App {
 	// Создаем новый сервер с единственным интерсептором
 	loggingOpts := []logging.Option{
 		logging.WithLogOnEvents(

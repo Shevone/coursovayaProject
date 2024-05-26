@@ -1,0 +1,72 @@
+
+
+export function handleSubscribeButton(lessonId){
+    let signUpData = {
+        lesson_id : lessonId
+    }
+    const token = localStorage.getItem('token')
+    console.log(lessonId)
+    if (token){
+        // если токен есть
+        fetch('http://localhost:8080/lessons/sign',{
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + token
+            },
+            body: JSON.stringify(signUpData)
+        }).then(response => {
+            // Проверяем, был ли ответ успешным
+            if (!response.ok) {
+                throw new Error('Ошибка сети: ' + response.statusText);
+            }
+            // Преобразуем ответ в формат JSON
+            return response.json();
+        }).then(data => {
+            // Обработка данных занятий
+            console.log(data);
+            window.alert(data.message)
+            location.reload()
+            // Добавьте код для отображения данных на странице
+        }).catch(error => {
+            // Обработка ошибок
+            alert("Не удалось записться")
+            console.error('Ошибка при получении данных:', error);
+        });
+    }else {
+        // токена нет
+        window.alert("Необходимо авторизоваться для записи на занятие")
+    }
+}
+
+export function getWeekDayString(weekDayInt){
+    switch (weekDayInt) {
+        case 0:
+            return 'Понедельник'
+        case 1:
+            return 'Вторник'
+        case 2:
+            return 'Среда'
+        case 3:
+            return 'Четверг'
+        case 4:
+            return 'Пятница'
+        case 5:
+            return 'Суббота'
+        case 6:
+            return 'Воскресенье'
+
+    }
+}
+export function getTimeString(time) {
+    // Проверяем, является ли входная строка строкой формата "час:минуты"
+    if (typeof time === 'string' && time.match(/^\d{1,2}:\d{2}$/)) {
+        return time; // Возвращаем строку без изменений
+    }
+
+    // Если входная строка не в формате "час:минуты", обрабатываем ее как число времени
+    const date = new Date(time);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+}

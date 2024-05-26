@@ -1,10 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <!-- Подключение стилей Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключение внешних стилей -->
+    <link rel="stylesheet" href="./styles/profile.css">
 </head>
 <body>
-$END$
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Спортклуб</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Главная</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="profile.html">Личный кабинет</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Информация о клубе</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row mt-4">
+        <div class="col">
+            <h1>Личный кабинет</h1>
+        </div>
+        <!-- Контейнер для профиля пользователя -->
+        <!-- Контейнер для профиля пользователя -->
+        <div class="col-4 ml-auto">
+            <div class="card profile-details">
+                <div class="card-body">
+                    <h5 class="card-title">Личные данные</h5>
+                    <p>Имя: <span id="user-name"></span></p>
+                    <p>Фамилия: <span id="user-surname"></span></p>
+                    <p>Отчество: <span id="user-patronymic"></span></p>
+                    <p>Логин: <span id="user-login"></span></p>
+                    <p>ID: <span id="user-id"></span></p>
+                    <p>Номер телефона: <span id="user-phone"></span></p>
+                    <p>Роль: <span id="user-role"></span></p>
+
+                    <button id="editProfileButton" class="btn btn-primary" >Изменить профиль</button>
+                    <button id="editPasswordButton" class="btn btn-primary">Изменить пароль</button>
+                    <button id="logoutButton" class="btn btn-danger">Выйти</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Контейнер для Информации для пользователя пользователя -->
+    <div class="row mt-4" id="profile-details">
+        <div id="create-btn-place"></div>
+        <div id="btn-place"></div>
+        <div id="user-info" class="col">
+            <ul id="info-list" class="list-group">
+                <!-- Здесь будут добавлены занятия из JavaScript -->
+            </ul>
+        </div>
+        <div id="low-btn-place"></div>
+    </div>
+    <!-- Модальное окно для редактирования данных -->
+    <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="dynamicModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dynamicModalLabel">Заголовок модального окна</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="dynamicModalBody">
+                    <!-- Здесь будет содержимое модального окна, добавленное через JavaScript -->
+                </div>
+                <div class="modal-footer" id="dynamicModalFooter">
+                    <!-- Здесь будет подвал модального окна, добавленный через JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключение скриптов Bootstrap и внешнего JavaScript файла -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- Подключение внешнего JavaScript файла -->
+<script type="module" src="scripts/profile-scripts.js"></script>
 </body>
 </html>

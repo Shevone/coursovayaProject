@@ -10,6 +10,10 @@ github.com/Shevone/proto-fitnes v0.0.0-20240320070408-29b9391939f0 h1:Viki4ZqSEK
 github.com/Shevone/proto-fitnes v0.0.0-20240320070408-29b9391939f0/go.mod h1:2uPmywkp/sLAZIeMTrSBB0V3jC3Uqm6GAd35Uk938WI=
 github.com/Shevone/proto-fitnes v0.0.0-20240323110440-15c0fe07d3c1 h1:e/0ZMUhMMBKvCoJrFcISSal2+aDIVM4i7bLjlS3gunY=
 github.com/Shevone/proto-fitnes v0.0.0-20240323110440-15c0fe07d3c1/go.mod h1:2uPmywkp/sLAZIeMTrSBB0V3jC3Uqm6GAd35Uk938WI=
+github.com/Shevone/proto-fitnes v0.0.0-20240521102129-69861f0433cd h1:FPhBmxhCFukFhkkJM7YrzukrbnXeUtjNZZ8Ci6+SdTs=
+github.com/Shevone/proto-fitnes v0.0.0-20240521102129-69861f0433cd/go.mod h1:2uPmywkp/sLAZIeMTrSBB0V3jC3Uqm6GAd35Uk938WI=
+github.com/Shevone/proto-fitnes v0.0.0-20240521103053-43da289ac700 h1:1sq6hsBu0cpup9Wonwj5Qa3NQ2796/jV41yKd1/iuas=
+github.com/Shevone/proto-fitnes v0.0.0-20240521103053-43da289ac700/go.mod h1:2uPmywkp/sLAZIeMTrSBB0V3jC3Uqm6GAd35Uk938WI=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
@@ -38,6 +42,8 @@ github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcU
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 golang.org/x/net v0.20.0 h1:aCL9BSgETF1k+blQaYUBx9hJ9LOGP3gAVemcZlf1Kpo=
 golang.org/x/net v0.20.0/go.mod h1:z8BVo6PvndSri0LbOE3hAn0apkU+1YvI6E70E9jsnvY=
+golang.org/x/sync v0.7.0 h1:YsImfSBoP9QPYL0xyKJPq0gcaJdG3rInoqxTWbfQu9M=
+golang.org/x/sync v0.7.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
 golang.org/x/sys v0.16.0 h1:xWw16ngr6ZMtmxDyKyIgsE93KNKz5HKmMa3b8ALHidU=
 golang.org/x/sys v0.16.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
 golang.org/x/text v0.14.0 h1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=

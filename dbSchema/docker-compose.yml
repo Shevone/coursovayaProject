@@ -1,88 +1,42 @@
 version: '3.8'
 
 services:
-  gateway:
-    build:
-      context: ./fitnes-gateway
-      dockerfile: ./Dockerfile
+  lessonsDb:
+    image: postgres:14.5
     ports:
-      - "8080:8080"
-    depends_on:
-      - accounts
-      - lessons
-    networks:
-      - fitnes_network
+      - "5435:5432"
     environment:
-      GATEWAY_ADDRESS: "8080"
-      GATEWAY__TIMEOUT: "5s"
-      GATEWAY_IDLETIMEOUT: "60s"
-
-      GATEWAY_APPSECRET: "ekxoalmapblaeksraulttoy"
-
-      GATEWAY_CLIENTS_ACCOUNTS_ADDRESS: "accounts:44044"
-      GATEWAY_CLIENTS_ACCOUNTS_TIMEOUT: "4s"
-      GATEWAY_CLIENTS_ACCOUNTS_RETRIESCOUNT: "10"
-
-      GATEWAY_CLIENTS_LESSONS_ADDRESS: "lessons:4312"
-      GATEWAY_CLIENTS_LESSONS_TIMEOUT: "4s"
-      GATEWAY_CLIENTS_LESSONS_RETRIESCOUNT: "10"
-
-
-
-  accounts:
-    build:
-      context: ./fitnes-accounts
-      dockerfile: ./Dockerfile
-    ports:
-      - "44044:44044"
-    networks:
-      - fitnes_network
-    depends_on:
-      - database
-    environment:
-      ACCOUNTS_STORAGEPATH: "./storage/database.db"
-      ACCOUNTS_GRPC_PORT: "44044"
-      ACCOUNTS_GRPC_TIMEOUT: "7s"
-      ACCOUNTS_SERVICE_TOKENTTL: "1h"
-
-  lessons:
-    build:
-      context: ./fitnes-lessons
-      dockerfile: ./Dockerfile
-    ports:
-      - "4312:4312"
-    networks:
-      - fitnes_network
-    depends_on:
-      - database
-    environment:
-      LESSONS_STORAGEPATH: "./storage/lessons2.db"
-      LESSONS_GRPC_PORT: "4312"
-      LESSONS_GRPC_TIMEOUT: "7s"
-
-  database:
-    image: postgres:latest
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: accounts
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lessons
     volumes:
-      - ./fitness-account/schema:/docker-entrypoint-initdb.d
-
+      - ./schemas/lessons:/docker-entrypoint-initdb.d
+    networks:
+      - fitnes_network
+  accountsDb:
+    image: postgres:14.5
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: accounts
+    volumes:
+      - ./schemas/accounts:/docker-entrypoint-initdb.d
+    networks:
+      - fitnes_network
   pgadmin:
     image: dpage/pgadmin4
     ports:
       - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: kola2003.ryabof@yandex.ru
-      # your_email@example.com
       PGADMIN_DEFAULT_PASSWORD: admin
-      # your_pgadmin_password
     depends_on:
-      - database
-
+      - lessonsDb
+      - accountsDb
+    networks:
+      - fitnes_network
 
 networks:
   fitnes_network:

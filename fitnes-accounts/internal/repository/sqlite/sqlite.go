@@ -1,4 +1,4 @@
-package repository
+package sqlite
 
 import (
 	"database/sql"
@@ -8,11 +8,7 @@ import (
 )
 
 type Config struct {
-	Host     string `default:"localhost"`
-	Port     int    `default:"5432"`
-	User     string `default:""`
-	Password string `default:""`
-	Database string `default:""`
+	DbPath string `default:"./storage/database.db"`
 }
 type Storage struct {
 	db *sql.DB
@@ -20,17 +16,7 @@ type Storage struct {
 
 func NewSqliteRepository(cfg *Config) (*Storage, error) {
 	const op = "storage.sqlite.New"
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database)
-	db, err := sql.Open("sqlite3", connStr)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
-	}
-	return &Storage{db: db}, nil
-}
-func NewPostgresRepository(cfg *Config) (*Storage, error) {
-	const op = "storage.sqlite.New"
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database)
-	db, err := sql.Open("postgres", connStr)
+	db, err := sql.Open("sqlite3", cfg.DbPath)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

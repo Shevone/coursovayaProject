@@ -1,10 +1,11 @@
-package repository
+package postgres
 
 import (
 	"database/sql"
+	"fitnes-account/internal/models"
 	"fmt"
 	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
+	"sync"
 )
 
 type Config struct {
@@ -16,19 +17,17 @@ type Config struct {
 }
 type Storage struct {
 	db *sql.DB
+	// ========================
+	adminLevels      map[int64]int
+	adminLevelsMutex sync.Mutex
+	// ========================
+	userIds    []int64
+	users      map[int64]*models.User
+	usersMutex sync.Mutex
 }
 
-func NewSqliteRepository(cfg *Config) (*Storage, error) {
-	const op = "storage.sqlite.New"
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database)
-	db, err := sql.Open("sqlite3", connStr)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
-	}
-	return &Storage{db: db}, nil
-}
 func NewPostgresRepository(cfg *Config) (*Storage, error) {
-	const op = "storage.sqlite.New"
+	const op = "storage.pq.New"
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -38,5 +37,17 @@ func NewPostgresRepository(cfg *Config) (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Storage{db: db}, nil
+	repo := &Storage{db: db}
+	repo.adminLevels = make(map[int64]int)
+	repo.userIds = make([]int64, 0)
+	repo.users = make(map[int64]*models.User)
+	err = repo.loadAdminLevels()
+	if err != nil {
+		return nil, err
+	}
+	err = repo.loadUsers()
+	if err != nil {
+		return nil, err
+	}
+	return repo, nil
 }

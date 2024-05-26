@@ -11,7 +11,13 @@ import (
 	"google.golang.org/grpc/status"
 	"log/slog"
 	"net"
+	"time"
 )
+
+type Config struct {
+	Port    int `default:"4343"`
+	Timeout time.Duration
+}
 
 // App - более высокоуровневая обертка над grpc
 // то же grpc, только уже с зарегистрированными методами
@@ -22,7 +28,7 @@ type App struct {
 }
 
 // NewGrpcApp - конструктор
-func NewGrpcApp(log *slog.Logger, authService auth.Accounts, port int) *App {
+func NewGrpcApp(log *slog.Logger, authService auth.Accounts, cfg *Config) *App {
 	// Создаем новый сервер с единственным интерсептором
 	loggingOpts := []logging.Option{
 		logging.WithLogOnEvents(
@@ -51,7 +57,7 @@ func NewGrpcApp(log *slog.Logger, authService auth.Accounts, port int) *App {
 	return &App{
 		log:        log,
 		gRPCServer: gRPCServer,
-		port:       port,
+		port:       cfg.Port,
 	}
 }
 

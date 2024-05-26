@@ -1,0 +1,14 @@
+http_server: # конфигурация нашего http-сервера
+  address: "8080"
+  timeout: 4s
+  idle_timeout: 30s
+clients:
+  accounts:
+    address: "localhost:44044"
+    timeout: 4s
+    retriesCount: 10
+  lessons:
+    address: "localhost:4312"
+    timeout: 4s
+    retriesCount: 10
+app_secret: "ekxoalmapblaeksraulttoy"
