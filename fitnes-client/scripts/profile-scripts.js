@@ -11,6 +11,7 @@ import {getJwtToken} from "./pakages/token.js";
 const roleAdmin = 'Admin'
 const roleUser = "User"
 const roleTrainer = "Trainer"
+const roleNew = "New"
 let curPage = 0;
 const limit = 5;
 let userId = -1;
@@ -44,6 +45,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     case roleUser:
                         renderUserMenu(token);
                         break;
+                    case roleNew():
+                        renderNewUserMenu(token);
                     default:
                         // Если роль неизвестна или не определена, выводим сообщение об ошибке
                         console.error('Не удалось определить роль пользователя.');
@@ -55,6 +58,14 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         })
 });
+
+
+// ======================================================================================
+function renderNewUserMenu(token){
+    profileFunctions.addTitle("Пока что тут пусто, дождитесь пока ваше членство подтвердит администратор.")
+}
+
+
 
 // ======================================================================================
 let next_page;

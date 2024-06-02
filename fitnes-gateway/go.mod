@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
-	github.com/Shevone/proto-fitnes v0.0.0-20240521103053-43da289ac700 // indirect
+	github.com/Shevone/proto-fitnes v0.0.0-20240529134428-98639a49a314 // indirect
 	github.com/bytedance/sonic v1.11.3 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect

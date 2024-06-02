@@ -31,6 +31,7 @@ function redirectToLoginPage() {
     window.location.href = "login-register.html";
 }
 
+
 // ==================================================================================================
 export function showModalUserDataEdit(userId, curName, curSurname, curPatronymic){
     const title = "Редактирование профиля";
@@ -134,6 +135,7 @@ function confirmLogout(event) {
 const roleAdmin = 'Admin';
 const roleUser = 'User';
 const roleTrainer = 'Trainer';
+const roleNew = 'New'
 
 export function showEditUserRoleModal(currentRole, userId) {
     const title = "Изменение роли пользователя";
@@ -146,6 +148,7 @@ export function showEditUserRoleModal(currentRole, userId) {
             <div class="form-group">
                 <label for="userRoleSelect">Выберите роль:</label>
                 <select class="form-control" id="userRoleSelect">
+                    <option value=${roleNew} ${currentRole === roleNew ? 'selected' : ''}>${roleNew}</option>
                     <option value=${roleAdmin} ${currentRole === roleAdmin ? 'selected' : ''}>${roleAdmin}</option>
                     <option value=${roleUser} ${currentRole === roleUser ? 'selected' : ''}>${roleUser}</option>
                     <option value=${roleTrainer} ${currentRole === roleTrainer ? 'selected' : ''}>${roleTrainer}</option>
@@ -167,8 +170,10 @@ function updateUserRole(event){
         selectedRoleInt = 0
     }else if (selectedRole === roleTrainer){
         selectedRoleInt = 1
-    }else {
+    }else if (selectedRole === roleAdmin) {
         selectedRoleInt = 2
+    }else {
+        selectedRoleInt = 3
     }
 
     let requestData = {

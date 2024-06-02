@@ -21,6 +21,7 @@ var (
 	roleUser    = "User"
 	roleTrainer = "Trainer"
 	roleAdmin   = "Admin"
+	roleNew     = "New"
 )
 
 type AccountsService struct {
@@ -99,15 +100,7 @@ func (aS *AccountsService) CreateUser(ctx *gin.Context, user models.User) (int64
 		Name:        user.Name,
 		PhoneNumber: user.PhoneNumber,
 		Surname:     user.Surname,
-	}
-
-	switch user.Role {
-	case roleUser:
-		registerRequest.Role = pb.Role_User
-	case roleTrainer:
-		registerRequest.Role = pb.Role_Trainer
-	case roleAdmin:
-		registerRequest.Role = pb.Role_Admin
+		Role:        pb.Role_New,
 	}
 
 	resp, err := aS.api.Register(ctx, registerRequest)
@@ -183,6 +176,8 @@ func (aS *AccountsService) GetUserProfile(ctx *gin.Context, userId int64) (*mode
 		user.Role = roleTrainer
 	case pb.Role_Admin:
 		user.Role = roleAdmin
+	case pb.Role_New:
+		user.Role = roleNew
 	}
 
 	return &user, nil
@@ -234,6 +229,9 @@ func (aS *AccountsService) GetUsers(ctx *gin.Context, request models.PaginateReq
 			user.Role = roleTrainer
 		case pb.Role_Admin:
 			user.Role = roleAdmin
+		case pb.Role_New:
+			user.Role = roleNew
+
 		}
 		usersList = append(usersList, user)
 	}
@@ -253,6 +251,9 @@ func (aS *AccountsService) EditUserRole(ctx *gin.Context, request models.EditUse
 		updateReq.Role = pb.Role_Trainer
 	case 2:
 		updateReq.Role = pb.Role_Admin
+	case 3:
+		updateReq.Role = pb.Role_New
+
 	default:
 		return "", fmt.Errorf("%s: %w", op, "User role has invalid argument")
 	}

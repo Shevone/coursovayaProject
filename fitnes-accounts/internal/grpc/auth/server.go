@@ -13,6 +13,7 @@ var (
 	roleUser    = "User"
 	roleTrainer = "Trainer"
 	roleAdmin   = "Admin"
+	roleNew     = "New"
 )
 
 type serverApi struct {
@@ -92,7 +93,7 @@ func (s *serverApi) Register(ctx context.Context, in *accountsFitnesv1.RegisterR
 		in.GetName(),
 		in.GetSurname(),
 		in.GetPatronymic(),
-		roleUser,
+		roleNew,
 		in.GetPhoneNumber())
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to register")
@@ -139,6 +140,8 @@ func (s *serverApi) GetUserData(ctx context.Context, in *accountsFitnesv1.GetDat
 		userModelResponse.Role = accountsFitnesv1.Role_Admin
 	case roleTrainer:
 		userModelResponse.Role = accountsFitnesv1.Role_Trainer
+	case roleNew:
+		userModelResponse.Role = accountsFitnesv1.Role_New
 	}
 	return &accountsFitnesv1.GetDataResponse{User: userModelResponse}, nil
 }
@@ -176,6 +179,9 @@ func (s *serverApi) GetUsers(ctx context.Context, in *accountsFitnesv1.GetUsersR
 			userModelResponse.Role = accountsFitnesv1.Role_Admin
 		case roleTrainer:
 			userModelResponse.Role = accountsFitnesv1.Role_Trainer
+		case roleNew:
+			userModelResponse.Role = accountsFitnesv1.Role_New
+
 		}
 		getUserResp.Users = append(getUserResp.Users, userModelResponse)
 	}

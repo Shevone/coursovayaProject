@@ -3,7 +3,7 @@ module fitnes-account
 go 1.22
 
 require (
-	github.com/Shevone/proto-fitnes v0.0.0-20240521103053-43da289ac700
+	github.com/Shevone/proto-fitnes v0.0.0-20240529134428-98639a49a314
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0

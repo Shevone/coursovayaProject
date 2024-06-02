@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-var (
+const (
 	roleAdmin = "Admin"
+	roleNew   = "New"
 )
 
 func (h *Handler) register(c *gin.Context) {

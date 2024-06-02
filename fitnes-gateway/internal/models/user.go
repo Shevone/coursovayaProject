@@ -14,7 +14,7 @@ type User struct {
 	Name        string `json:"name"`
 	Surname     string `json:"surname"`
 	Patronymic  string `json:"patronymic"`
-	Role        string `json:"role" validate:"oneof=Admin User Trainer"`
+	Role        string `json:"role" validate:"oneof=Admin User Trainer New"`
 	PhoneNumber string `json:"phoneNumber"`
 }
 

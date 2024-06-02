@@ -9,7 +9,7 @@ require (
 )
 
 require (
-	github.com/Shevone/proto-fitnes v0.0.0-20240521103053-43da289ac700 // indirect
+	github.com/Shevone/proto-fitnes v0.0.0-20240529134428-98639a49a314 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
