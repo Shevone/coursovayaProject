@@ -18,6 +18,8 @@ type Accounts interface {
 	EditUserPassword(ctx *gin.Context, request models.UpdatePasswordRequest) (string, error)
 
 	ParseToken(accessToken string) (*models.TokenClaims, error)
+
+	IsAdmin(userId int64) bool
 }
 
 type Lessons interface {

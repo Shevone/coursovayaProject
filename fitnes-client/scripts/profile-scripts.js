@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     case roleUser:
                         renderUserMenu(token);
                         break;
-                    case roleNew():
+                    case roleNew:
                         renderNewUserMenu(token);
                     default:
                         // Если роль неизвестна или не определена, выводим сообщение об ошибке

@@ -128,7 +128,7 @@ func (s *Storage) EditUserRole(ctx context.Context, userId int64, newRole string
 	}
 	if newRole == roleAdmin {
 		// Сохраняем в таблицу с уровнем админов
-		updaterLevel := s.getUpdaterAdminLevel(updaterId)
+		updaterLevel := s.getUpdaterAdminLevel(updaterId) + 1
 		s.saveNewAdmin(ctx, userId, updaterLevel)
 		// Сохраняем в мапу с уровнем админства
 	}

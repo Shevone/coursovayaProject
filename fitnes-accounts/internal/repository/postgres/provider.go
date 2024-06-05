@@ -151,3 +151,10 @@ func (s *Storage) getUsers(ctx context.Context) ([]models.User, error) {
 	}
 	return usersList, nil
 }
+func (s *Storage) IsAdmin(ctx context.Context, userId int64) (bool, error) {
+	s.adminLevelsMutex.Lock()
+	defer s.adminLevelsMutex.Unlock()
+
+	_, ok := s.adminLevels[userId]
+	return ok, nil
+}

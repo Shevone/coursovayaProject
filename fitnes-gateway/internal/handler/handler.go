@@ -41,6 +41,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		withAuthorization := auth.Group("/", h.userIdentity)
 		{
+			// Todo необходимо сделать проверку того, что либо пользователь сам меняет, либо админ ему меняет
+			// для этого мы добавим в edit profile и password проверку переданного id и id из токена
+			// если они совпадают, то ок
+			// если они не совпадают, то берем user_id из токена и идем в микросервис, с вопросом
+			// Админ он или нет
 			withAuthorization.PUT("/edit-password", h.updateUserPassword)
 			withAuthorization.POST("/profile", h.profile)         // Профиль
 			withAuthorization.PUT("/edit-profile", h.editProfile) // Изменение данных профиля

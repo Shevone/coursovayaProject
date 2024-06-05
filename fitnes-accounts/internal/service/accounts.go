@@ -64,6 +64,7 @@ type UserProvider interface {
 		page int64,
 		limit int64,
 	) ([]*models.User, error)
+	IsAdmin(ctx context.Context, userId int64) (bool, error)
 }
 
 // NewAccountService - конструктор сервисного слоя
@@ -252,4 +253,16 @@ func (a *AccountService) UpdateUserRole(ctx context.Context, userId int64, newRo
 		return "err", err
 	}
 	return message, nil
+}
+
+func (a *AccountService) IsAdmin(ctx context.Context, userId int64) (bool, error) {
+	log := a.logger.With(
+		slog.String("op", "IsAdmin"),
+		slog.Int64("userId", userId))
+	result, err := a.usrProvider.IsAdmin(ctx, userId)
+	if err != nil {
+		log.Error("failed to check if user has admin")
+		return false, err
+	}
+	return result, nil
 }

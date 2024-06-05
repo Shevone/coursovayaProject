@@ -12,6 +12,8 @@ github.com/Shevone/proto-fitnes v0.0.0-20240521103053-43da289ac700 h1:1sq6hsBu0c
 github.com/Shevone/proto-fitnes v0.0.0-20240521103053-43da289ac700/go.mod h1:2uPmywkp/sLAZIeMTrSBB0V3jC3Uqm6GAd35Uk938WI=
 github.com/Shevone/proto-fitnes v0.0.0-20240529134428-98639a49a314 h1:ejVTpUhWo1jdfR2Kb0WvjW4l4eCw3CPYBY3qD1gm84c=
 github.com/Shevone/proto-fitnes v0.0.0-20240529134428-98639a49a314/go.mod h1:2uPmywkp/sLAZIeMTrSBB0V3jC3Uqm6GAd35Uk938WI=
+github.com/Shevone/proto-fitnes v0.0.0-20240602123708-e7480fc7ef02 h1:GxgshSknn6JbFtdznFk3oB99G5pJ3pKoBSls2gCMmls=
+github.com/Shevone/proto-fitnes v0.0.0-20240602123708-e7480fc7ef02/go.mod h1:2uPmywkp/sLAZIeMTrSBB0V3jC3Uqm6GAd35Uk938WI=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang-jwt/jwt/v5 v5.2.1 h1:OuVbFODueb089Lh128TAcimifWaLhJwVflnrgM17wHk=

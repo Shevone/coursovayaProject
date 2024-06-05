@@ -66,7 +66,7 @@ export function getTimeString(time) {
 
     // Если входная строка не в формате "час:минуты", обрабатываем ее как число времени
     const date = new Date(time);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const hours = time[11]+time[12];
+    const minutes = time[14]+time[15];
     return `${hours}:${minutes}`;
 }

@@ -27,7 +27,7 @@ type Service interface {
 	GetLessonsByWeekDay(ctx context.Context, weekDay int32) ([]*models.Lesson, error)
 
 	SignUpForLessonOrCancel(ctx context.Context, lessonId int64, userId int64) (string, error)
-	// CloseLesson(ctx context.Context, lessonId int64, trainerId int64) (bool, error)
+
 	EditLesson(ctx context.Context, lesson *models.Lesson) (int64, error)
 }
 

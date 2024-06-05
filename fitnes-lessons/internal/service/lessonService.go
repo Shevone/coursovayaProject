@@ -25,22 +25,10 @@ type LessonSaver interface {
 	ClearLessonSub(ctx context.Context, lessonId int64) (bool, error)
 }
 type LessonProvider interface {
-	/*
-		GetLessonFromDb(ctx context.Context, lessonId int64) (*models.Lesson, error)
-		GetLessonsByTrainerIdFromDb(ctx context.Context, trainerId int64, page int32, limit int32) ([]*models.Lesson, error)
-		GetLessonsByUserIdFromDb(ctx context.Context, userId int64, page int32, limit int32) ([]*models.Lesson, error)
-	*/
-
 	GetAllLessonsFromDb(ctx context.Context) ([]*models.Lesson, error)
 	GetAllUserLessons(ctx context.Context) (map[int64][]int64, error)
 }
 type LessonSubscriber interface {
-	/*
-		SignUpForLessonOrCancelDb(ctx context.Context, lessonId int64, userId int64) (string, error)
-	*/
-
-	// CloseLessonDb(ctx context.Context, lessonId int64) (bool, error)
-
 	SignForLesson(ctx context.Context, lessonId int64, userId int64) error
 	SignOutFromLesson(ctx context.Context, lessonId int64, userId int64) error
 }
@@ -71,7 +59,7 @@ func (l *LessonService) runWorker(ctx context.Context) {
 	// Как только отрабатывает мы получаем сегодняшний день недели в числе
 	// А так же получаем текщуее время
 	// Отправляем время в буфер
-	ticker := time.NewTicker(30 * time.Minute)
+	ticker := time.NewTicker(1 * time.Minute)
 	for {
 		select {
 		case <-ctx.Done():

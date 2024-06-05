@@ -40,6 +40,7 @@ type Accounts interface {
 	UpdateUserRole(ctx context.Context, userId int64, newRole string, updaterId int64) (
 		string, error)
 	UpdatePassword(ctx context.Context, userId int64, password string, updaterId int64) (string, error)
+	IsAdmin(ctx context.Context, userId int64) (bool, error)
 }
 
 // Register - метод регистрирующий наш обработчик(Accounts) на созданный grpc сервер
@@ -214,4 +215,11 @@ func (s *serverApi) UpdateUserPassword(ctx context.Context, in *accountsFitnesv1
 		return nil, status.Error(codes.Internal, "failed to change user role")
 	}
 	return &accountsFitnesv1.UpdateUserPasswordResp{Message: message}, nil
+}
+func (s *serverApi) IsAdmin(ctx context.Context, in *accountsFitnesv1.IsAdminReq) (*accountsFitnesv1.IsAdminResp, error) {
+	result, error := s.accountsService.IsAdmin(ctx, in.Id)
+	if error != nil {
+		return nil, status.Error(codes.Internal, "failed to check admin")
+	}
+	return &accountsFitnesv1.IsAdminResp{IsAdmin: result}, nil
 }

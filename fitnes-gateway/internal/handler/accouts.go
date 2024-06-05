@@ -88,10 +88,15 @@ func (h *Handler) editProfile(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.ErrResponse{Message: "invalid data"})
 		return
 	}
-	_, err := inputUser.GetId()
+	editedId, err := inputUser.GetId()
 	if err != nil {
 		h.logger.Error("%s: %w", op, err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.ErrResponse{Message: "wrong user id"})
+		return
+	}
+	editorId := c.GetInt64(userIdCtx)
+	if h.userHasRules(editedId, editorId) {
+		c.AbortWithStatusJSON(http.StatusForbidden, models.ErrResponse{Message: "edit rules is forbidden"})
 		return
 	}
 	resultMessage, err := h.service.AccountService.EditUserProfile(c, inputUser)
@@ -206,6 +211,12 @@ func (h *Handler) updateUserPassword(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.ErrResponse{Message: err.Error()})
 		return
 	}
+	editorId := c.GetInt64(userIdCtx)
+	if !h.userHasRules(input.UserId, editorId) {
+		h.logger.Error("%s: %w", op, "User has no rules")
+		c.AbortWithStatusJSON(http.StatusForbidden, models.ErrResponse{Message: "User has no rules"})
+		return
+	}
 	result, err := h.service.AccountService.EditUserPassword(c, input)
 	if err != nil {
 		h.logger.Error("%s: %w", op, err)
@@ -213,4 +224,12 @@ func (h *Handler) updateUserPassword(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, result)
+}
+func (h *Handler) userHasRules(editUserId, editorId int64) bool {
+	// На вход нам хочется получить id из запроса и id из токена
+	if editorId == editUserId {
+		return true
+	}
+	isAdmin := h.service.AccountService.IsAdmin(editorId)
+	return isAdmin
 }

@@ -29,6 +29,16 @@ type AccountsService struct {
 	log *slog.Logger
 }
 
+func (aS *AccountsService) IsAdmin(userId int64) bool {
+	req := &pb.IsAdminReq{Id: userId}
+	result, err := aS.api.IsAdmin(context.Background(), req)
+	if err != nil {
+		aS.log.Warn("IsAdmin err: ", err)
+		return false
+	}
+	return result.IsAdmin
+}
+
 // NewAccountClient конструктор клиента grpc
 func NewAccountClient(
 	ctx context.Context,

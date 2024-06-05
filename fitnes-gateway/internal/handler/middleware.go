@@ -82,6 +82,13 @@ func (h *Handler) validateIsAdmin(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, models.ErrResponse{Message: errMsg})
 		return
 	}
+	isAdmin := h.service.AccountService.IsAdmin(claims.Id)
+	if !isAdmin {
+		errMsg := "User has no admin rules"
+		h.logger.Error("%s: %w", op, errMsg)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, models.ErrResponse{Message: errMsg})
+		return
+	}
 }
 func (h *Handler) validateIsAdminOrTrainer(c *gin.Context) {
 	const op = "middleware.isAdminOrTrainer"
@@ -113,7 +120,7 @@ func (h *Handler) validateIsAdminOrTrainer(c *gin.Context) {
 	if claims.Role != roleAdmin && claims.Role != roleTrainer {
 		errMsg := "User has no admin rules"
 		h.logger.Error("%s: %w", op, errMsg)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, models.ErrResponse{Message: errMsg})
+		c.AbortWithStatusJSON(http.StatusForbidden, models.ErrResponse{Message: errMsg})
 		return
 	}
 }
