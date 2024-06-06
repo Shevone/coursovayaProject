@@ -26,7 +26,6 @@ export function handleSubscribeButton(lessonId){
             // Обработка данных занятий
             console.log(data);
             window.alert(data.message)
-            location.reload()
             // Добавьте код для отображения данных на странице
         }).catch(error => {
             // Обработка ошибок

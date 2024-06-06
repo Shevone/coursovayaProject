@@ -59,7 +59,7 @@ func (l *LessonService) runWorker(ctx context.Context) {
 	// Как только отрабатывает мы получаем сегодняшний день недели в числе
 	// А так же получаем текщуее время
 	// Отправляем время в буфер
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(10 * time.Minute)
 	for {
 		select {
 		case <-ctx.Done():
