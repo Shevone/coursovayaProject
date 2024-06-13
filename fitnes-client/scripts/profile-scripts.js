@@ -2,6 +2,7 @@ import * as tokenFunctions from './pakages/token.js';
 import * as profileFunctions from './profile/profile-func.js';
 import * as lessonsFunctions from './pakages/lessons.js';
 import * as modalFunctions from './profile/modal.js';
+import * as allModal from './pakages/modal.js';
 import {getTimeString, getWeekDayString} from "./pakages/lessons.js";
 import {getJwtToken} from "./pakages/token.js";
 
@@ -99,7 +100,7 @@ function drawUserList(page,token){
             }
         })
         .catch((error) => {
-            alert("Ошибка при получении данных")
+            allModal.showInfoModalWithMessage("Ошибка при получении данных")
         });
 }
 
@@ -144,9 +145,9 @@ function addUserToPage(user){
         "Фамилия: " + user.surname + "<br>" +
         "Отчество: " + user.patronymic + "<br>" +
         "Номер телефона: " + user.phoneNumber + "<br>" +
-        "Роль: " + user.role + "<br>";
+        "Роль: " + profileFunctions.getRussianRoleName(user.role) + "<br>";
 
-    // TODO кнопки: функция обработки каждой кнопки
+
     const editProfileButton = profileFunctions.createButtonWithTextAndHandler('Изменить данные',function (){
         modalFunctions.showModalUserDataEdit(user.id, user.name,user.surname, user.patronymic)
     })
@@ -200,7 +201,7 @@ function drawTrainerLessonsList(page, token){
             }
         })
         .catch((error) => {
-            alert("Ошибка при получении данных")
+            allModal.showInfoModalWithMessage("Ошибка при получении данных")
         });
 }
 function getTrainerLessonsFromServer(page, token) {
@@ -293,7 +294,7 @@ function drawUserLessons(page, token){
         })
         .catch((error) => {
             console.log(error)
-            alert("Ошибка при получении данных")
+            allModal.showInfoModalWithMessage("Ошибка при получении данных")
         });
 }
 function getUserLessonsFromServer(page, token){

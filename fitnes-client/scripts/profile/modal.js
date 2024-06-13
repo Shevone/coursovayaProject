@@ -15,6 +15,38 @@ function openDynamicModal(title, bodyContent, footerContent, handlerMethod) {
     confirmLogoutButton.addEventListener('click', handlerMethod);
 }
 
+function openInfoModalProfile(title, bodyContent, footerContent, handler) {
+    // Заполняем заголовок модального окна
+    document.getElementById('dynamicModalInfoLabel').innerText = title;
+
+    // Заполняем содержимое тела модального окна
+    document.getElementById('dynamicModalInfoBody').innerHTML = bodyContent;
+
+    // Заполняем содержимое подвала модального окна
+    document.getElementById('dynamicModalInfoFooter').innerHTML = footerContent;
+
+    // Открываем модальное окно
+    let modal = new bootstrap.Modal(document.getElementById('dynamicModalInfo'));
+    modal.show();
+    const closeButton = document.getElementById('closeBtn');
+    closeButton.addEventListener('click', handler)
+
+}
+
+
+// ==================================================================================================
+function showInfoModalWithMessage(message, handler) {
+    // Функция для открытия модального окна с подтверждением
+    const title = "Сообщение";
+    const bodyContent = `<p>${message}</p>`; // Добавляем сообщение в bodyContent
+    const footerContent = `
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeBtn">Ок</button>
+    `;
+    if (handler == null){
+        handler = function (){}
+    }
+    openInfoModalProfile(title, bodyContent, footerContent, handler);
+}
 // ==================================================================================================
 export function showConfirmationModal() {
     // Функция для открытия модального окна с подтверждением
@@ -71,7 +103,7 @@ function updateProfile(event){
 
     // Проверяем, что имя и фамилия не пустые
     if (firstName === "" || lastName === "") {
-        alert("Имя и фамилия должны быть заполнены.");
+        showInfoModalWithMessage("Имя и фамилия должны быть заполнены.");
         return;
     }
 
@@ -93,19 +125,18 @@ function updateProfile(event){
     })
         .then(response => response.json())
         .then(data => {
-            alert(data.message); // Выводим результат запроса пользователю
-            const modalElement = document.getElementById('dynamicModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-            location.reload()
+            showInfoModalWithMessage(data.message, function (){
+                location.reload()
+            });
+
 
         })
         .catch(error => {
-            alert(error); // Выводим результат запроса пользователю
-            const modalElement = document.getElementById('dynamicModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-            location.reload()
+            showInfoModalWithMessage(error, function (){
+
+                location.reload()
+            }); // Выводим результат запроса пользователю
+
 
         });
     event.target.removeEventListener('click', updateProfile);
@@ -148,10 +179,10 @@ export function showEditUserRoleModal(currentRole, userId) {
             <div class="form-group">
                 <label for="userRoleSelect">Выберите роль:</label>
                 <select class="form-control" id="userRoleSelect">
-                    <option value=${roleNew} ${currentRole === roleNew ? 'selected' : ''}>${roleNew}</option>
-                    <option value=${roleAdmin} ${currentRole === roleAdmin ? 'selected' : ''}>${roleAdmin}</option>
-                    <option value=${roleUser} ${currentRole === roleUser ? 'selected' : ''}>${roleUser}</option>
-                    <option value=${roleTrainer} ${currentRole === roleTrainer ? 'selected' : ''}>${roleTrainer}</option>
+                    <option value=${roleNew} ${currentRole === roleNew ? 'selected' : ''}>Гость</option>
+                    <option value=${roleAdmin} ${currentRole === roleAdmin ? 'selected' : ''}>Админ</option>
+                    <option value=${roleUser} ${currentRole === roleUser ? 'selected' : ''}>Клиент</option>
+                    <option value=${roleTrainer} ${currentRole === roleTrainer ? 'selected' : ''}>Тренер</option>
                 </select>
             </div>
         </div>
@@ -181,6 +212,7 @@ function updateUserRole(event){
         new_role: selectedRoleInt,
 
     };
+
     const userToken = localStorage.getItem('token')
     fetch('http://localhost:8080/account/for-admin/update-role', {
         method: 'PUT',
@@ -192,21 +224,19 @@ function updateUserRole(event){
     }).then(response => response.json())
         .then(data => {
 
-            alert(data); // Выводим результат запроса пользователю
-            const modalElement = document.getElementById('dynamicModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-            event.target.removeEventListener('click', updateUserRole);
-            location.reload()
+            showInfoModalWithMessage(data, function (){
+                event.target.removeEventListener('click', updateUserRole);
+                location.reload()
+            }); // Выводим результат запроса пользователю
+
 
         })
         .catch(error => {
-            alert(error); // Выводим результат запроса пользователю
-            const modalElement = document.getElementById('dynamicModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-            event.target.removeEventListener('click', updateUserRole);
-            location.reload()
+            showInfoModalWithMessage(error, function (){
+                event.target.removeEventListener('click', updateUserRole);
+                location.reload()
+            }); // Выводим результат запроса пользователю
+
 
         });
 }
@@ -241,7 +271,7 @@ async function changePassword(event) {
     const userId = parseInt(document.getElementById('userId').value);
 
     if (newPassword !== confirmPassword) {
-        alert("Пароли не совпадают!");
+        showInfoModalWithMessage("Пароли не совпадают!");
         return;
     }
 
@@ -250,23 +280,32 @@ async function changePassword(event) {
         user_id: userId,
         password: newPassword
     }
-    const response = await fetch('http://localhost:8080/account/edit-password ', {
-        method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(request)
-    });
+    try{
+        const response = await fetch('http://localhost:8080/account/edit-password', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        });
+        // Проверяем, был ли ответ успешным
+        if (!response.ok) {
+            throw new Error('Ошибка сети: ' + response.statusText);
+        }
 
-    if (response.ok) {
+        // Преобразуем ответ в формат JSON
         const data = await response.json();
-        alert(data); // Вывод сообщения из ответа сервера
-        location.reload()
-    } else {
-        alert('Ошибка при изменении пароля!');
-        location.reload()
+        if (response.ok) {
+            const msg = data;
+            showInfoModalWithMessage(msg, function (){location.reload()}); // Вывод сообщения из ответа сервера
+        }
+    } catch (error){
+        console.log(error)
+        showInfoModalWithMessage('Ошибка при изменении пароля', function (){})
     }
+
+
 }
 // ==================================================================================================
 export function showCreateLessonModal(trainerId) {
@@ -358,10 +397,10 @@ function createLesson() {
     const lessonTime = document.getElementById('lessonTime').value;
 
     if (lessonName === ""){
-        alert("Название не должно быть пустым")
+        showInfoModalWithMessage("Название не должно быть пустым")
     }
     if (lessonTime === ""){
-        alert("Выберите время занятия")
+        showInfoModalWithMessage("Выберите время занятия")
     }
     const requestData = {
         title : lessonName,
@@ -381,10 +420,10 @@ function createLesson() {
         body: JSON.stringify(requestData)
     }).then(response => {
         if (response.ok) {
-            alert("Занятие создано!")
-            location.reload()
+            showInfoModalWithMessage("Занятие создано!", function (){location.reload()});
+
         } else {
-            alert("Произошла ошибка, попробуйте позже")
+            showInfoModalWithMessage("Произошла ошибка, попробуйте позже");
         }
     });
 }
@@ -421,10 +460,10 @@ function deleteLesson() {
         body: JSON.stringify(requestData)
     }).then(response => {
         if (response.ok) {
-            alert("Занятие удалено")
-            location.reload()
+            showInfoModalWithMessage("Занятие удалено", function (){ location.reload()});
+
         } else {
-            alert("Произошла ошибка, попробуйте позже")
+            showInfoModalWithMessage("Произошла ошибка, попробуйте позже")
         }
     });
 }
@@ -514,7 +553,7 @@ function editLesson() {
 
     const ok =validateRequestData(requestData)
     if (!ok){
-        alert("Все данные должны быть заполнены")
+        showInfoModalWithMessage("Все данные должны быть заполнены")
         return
     }
     requestData.trainerId = trainerId;
@@ -531,10 +570,10 @@ function editLesson() {
         body: JSON.stringify(requestData)
     }).then(response => {
         if (response.ok) {
-            alert("Занятие отредактированно!")
-            location.reload()
+            showInfoModalWithMessage("Занятие отредактированно!", function (){ location.reload()});
+
         } else {
-            alert("Произошла ошибка, попробуйте позже")
+            showInfoModalWithMessage("Произошла ошибка, попробуйте позже")
         }
     });
 

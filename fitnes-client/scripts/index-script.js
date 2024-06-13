@@ -1,4 +1,5 @@
-    import * as lessonsFunctions from './pakages/lessons.js';
+import * as modalFunc from './pakages/modal.js';
+import * as lessonsFunctions from './pakages/lessons.js';
     import * as tokenFunctions from './pakages/token.js';
 
 
@@ -144,8 +145,9 @@ function loadLessons(day){
         signUpButton.style.display = "block";
         // Добавление обработчика события для кнопки
 
-        signUpButton.addEventListener("click", function() {
-            lessonsFunctions.handleSubscribeButton(lessonId);
+        signUpButton.addEventListener("click", async function() {
+            const msg = await lessonsFunctions.handleSubscribeButton(lessonId);
+            modalFunc.showInfoModalWithMessage(msg);
         });
 
         // Добавление кнопки "Записаться" к элементу списка

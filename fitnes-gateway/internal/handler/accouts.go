@@ -95,8 +95,8 @@ func (h *Handler) editProfile(c *gin.Context) {
 		return
 	}
 	editorId := c.GetInt64(userIdCtx)
-	if h.userHasRules(editedId, editorId) {
-		c.AbortWithStatusJSON(http.StatusForbidden, models.ErrResponse{Message: "edit rules is forbidden"})
+	if !h.userHasRules(editedId, editorId) {
+		c.AbortWithStatusJSON(http.StatusForbidden, models.ErrResponse{Message: "У вас нет прав на изменеие пользователя"})
 		return
 	}
 	resultMessage, err := h.service.AccountService.EditUserProfile(c, inputUser)
@@ -214,7 +214,7 @@ func (h *Handler) updateUserPassword(c *gin.Context) {
 	editorId := c.GetInt64(userIdCtx)
 	if !h.userHasRules(input.UserId, editorId) {
 		h.logger.Error("%s: %w", op, "User has no rules")
-		c.AbortWithStatusJSON(http.StatusForbidden, models.ErrResponse{Message: "User has no rules"})
+		c.AbortWithStatusJSON(http.StatusForbidden, models.ErrResponse{Message: "У вас нет прав для изменения пароля"})
 		return
 	}
 	result, err := h.service.AccountService.EditUserPassword(c, input)

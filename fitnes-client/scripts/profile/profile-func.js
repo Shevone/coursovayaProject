@@ -55,7 +55,7 @@ function setUserData(userData){
     idElement.textContent = userData.id;
     patronymicElement.textContent = userData.patronymic;
     phoneNumberElement.textContent = userData.phoneNumber;
-    roleElement.textContent = userData.role;
+    roleElement.textContent = getRussianRoleName(userData.role);
     surnameElement.textContent = userData.surname;
 }
 
@@ -142,6 +142,19 @@ export function createPagination(placeholderName,prevPage, currentPage, nextPage
     btnPlace.appendChild(prevBtn);
     btnPlace.appendChild(currentPageDiv);
     btnPlace.appendChild(nextBtn);
+}
 
-
+export function getRussianRoleName(role){
+    switch (role.toLowerCase()) {
+        case 'admin':
+            return 'Админ';
+        case 'trainer':
+            return 'Тренер';
+        case 'user':
+            return 'Клиент';
+        case 'new':
+            return 'Гость';
+        default:
+            return 'Неизвестная роль';
+    }
 }

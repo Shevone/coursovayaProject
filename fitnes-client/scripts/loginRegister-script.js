@@ -1,4 +1,4 @@
-
+import * as modalFunc from './pakages/modal.js';
 
 document.addEventListener("DOMContentLoaded", function() {
     // Проверяем наличие токена в localStorage
@@ -25,8 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     document.getElementById('openRegModal').addEventListener('click', function() {
         showRegisterModal()
-    });
-    const btn =  document.getElementById('loginBtn')
+    });const btn =  document.getElementById('loginBtn')
    btn.addEventListener('click', function (){
         login()
     })
@@ -69,22 +68,22 @@ function login (){
             console.log("Token:", token);
 
             // Далее вы можете использовать этот токен для аутентификации и авторизации пользователя
-            alert("login successful!");
-             if (token) {
-                // Сохраняем токен в локальном хранилище (localStorage) или куках, чтобы его можно было использовать на других страницах
-                localStorage.setItem('token', token);
-
-                // Перенаправляем пользователя на другую страницу
-                 window.location.href = "index.html";
-            } else {
-                // Если токен не был получен, обрабатываем ошибку аутентификации
-                console.error("Ошибка аутентификации: токен не был получен");
-                alert("Войдите еще раз")
-            }
+            modalFunc.showInfoModalWithMessage("Вы вошли в систему!", function () {
+                if (token) {
+                    // Сохраняем токен в локальном хранилище (localStorage) или куках, чтобы его можно было использовать на других страницах
+                    localStorage.setItem('token', token);
+                    // Перенаправляем пользователя на другую страницу
+                    window.location.href = "index.html";
+                } else {
+                    // Если токен не был получен, обрабатываем ошибку аутентификации
+                    console.error("Ошибка аутентификации: токен не был получен");
+                    alert("Авторизируйтесь еще раз, произошла ошибка")
+                }
+            })
         })
         .catch(error => {
             // Обрабатываем ошибку, если что-то пошло не так
-            alert(error.message);
+            modalFunc.showInfoModalWithMessage("Произошла ошибка при авторизации", function(){})
         });
 
 }
@@ -118,7 +117,11 @@ function registerFetch(){
     let confirmPassword = document.getElementById("confirmPassword").value;
 
     if (password !== confirmPassword) {
-        alert("Passwords do not match!");
+        modalFunc.showInfoModalWithMessage("Пароли не сходятся!", function (){})
+        return;
+    }
+    if (!isRussianPhoneNumber(phoneNumber)){
+        modalFunc.showInfoModalWithMessage("Неверный формат номера телефона", function (){})
         return;
     }
 
@@ -139,14 +142,41 @@ function registerFetch(){
         body: JSON.stringify(userData)
     }).then(response =>{
         if (response.ok){
-            alert("Регистрация прошла успешно!")
-            location.reload()
+            modalFunc.showInfoModalWithMessage("Регистрация прошла успешно", function (){
+                document.getElementById("loginUsername").value = email;
+                document.getElementById("loginPassword").value = password;
+                login()
+            })
         }else {
-            alert("Ошибка при регистрации")
+           modalFunc.showInfoModalWithMessage("Произошла ошибка при регистрации", function (){})
         }
     })
 }
+function isRussianPhoneNumber(phone) {
+    // Убираем пробелы и тире из строки
+    phone = phone.replace(/[- ]/g, '');
 
+    // Проверка на наличие +7 или 8
+    if (!phone.startsWith('+7') && !phone.startsWith('8')) {
+        return false;
+    }
+
+    // Убираем +7 или 8, если они есть
+    phone = phone.replace(/^(\+7|8)/, '');
+
+    // Проверка на правильный формат кода оператора (3 цифры)
+    if (!/^\d{3}$/.test(phone.slice(0, 3))) {
+        return false;
+    }
+
+    // Проверка на правильный формат оставшихся цифр (7 цифр)
+    if (!/^\d{7}$/.test(phone.slice(3))) {
+        return false;
+    }
+
+    // Если все проверки пройдены, возвращаем true
+    return true;
+}
 function openDynamicModal(title, bodyContent, footerContent, handlerMethod) {
     // Заполняем заголовок модального окна
     document.getElementById('dynamicModalLabel').innerText = title;

@@ -62,9 +62,6 @@ func NewBuffer(lessons []*models.Lesson, userLessons map[int64][]int64) *Buffer 
 func (b *Buffer) IsExist(targetLesson *models.Lesson) (int64, bool) {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	// Проверям, существует
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
 	for _, lesson := range b.lessons {
 		// Сравнение по заданным полям
 		if lesson.Title == targetLesson.Title &&

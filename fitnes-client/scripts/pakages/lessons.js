@@ -1,40 +1,45 @@
 
 
-export function handleSubscribeButton(lessonId){
+export async function handleSubscribeButton(lessonId) {
     let signUpData = {
-        lesson_id : lessonId
-    }
-    const token = localStorage.getItem('token')
-    console.log(lessonId)
-    if (token){
-        // если токен есть
-        fetch('http://localhost:8080/lessons/sign',{
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': "Bearer " + token
-            },
-            body: JSON.stringify(signUpData)
-        }).then(response => {
+        lesson_id: lessonId,
+    };
+    const token = localStorage.getItem('token');
+
+    if (token) {
+        // Если токен есть
+        try {
+            const response = await fetch('http://localhost:8080/lessons/sign', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(signUpData),
+            });
+
             // Проверяем, был ли ответ успешным
             if (!response.ok) {
                 throw new Error('Ошибка сети: ' + response.statusText);
             }
+
             // Преобразуем ответ в формат JSON
-            return response.json();
-        }).then(data => {
-            // Обработка данных занятий
-            console.log(data);
-            window.alert(data.message)
-            // Добавьте код для отображения данных на странице
-        }).catch(error => {
+            const data = await response.json();
+
+            // Возвращаем поле message из тела запроса, если статус код == 200
+            if (response.status === 200) {
+                const message = data.message;
+                return message;
+            } else {
+                return 'Не удалось записаться';
+            }
+        } catch (error) {
             // Обработка ошибок
-            alert("Не удалось записться")
             console.error('Ошибка при получении данных:', error);
-        });
-    }else {
-        // токена нет
-        window.alert("Необходимо авторизоваться для записи на занятие")
+            return 'Не удалось записаться';
+        }
+    } else {
+        return 'Необходимо авторизоваться для записи на занятие';
     }
 }
 

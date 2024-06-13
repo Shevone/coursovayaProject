@@ -233,6 +233,8 @@ func (l *LessonService) EditLesson(ctx context.Context, lesson *models.Lesson) (
 			return -1, fmt.Errorf("Нельзя установить такое количество мест")
 		}
 		lesson.CurUsersCount = lesson.AvailableSeats - userCount
+	} else {
+		lesson.CurUsersCount = lessonPrev.CurUsersCount
 	}
 
 	res, err := l.lessonSaver.EditLessonDb(ctx, lesson)
